@@ -1,0 +1,16 @@
+if not _G.FL then 
+	_G.FL = true
+	local Label
+	for index, obj in game.Players.LocalPlayer.PlayerGui.Anim:GetChildren() do
+		if obj:IsA("TextLabel") then
+			if string.find(obj.Text, "Онлайн") then
+				obj.LocalScript.Disabled = true
+				Label = obj
+			end
+		end
+	end
+	
+	workspace.MainTimerForNew.Part.SurfaceGui.TextLabel.Changed:Connect(function()
+		Label.Text = workspace.MainTimerForNew.Part.SurfaceGui.TextLabel.Text
+	end)
+end
