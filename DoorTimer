@@ -1,7 +1,7 @@
 if not _G.FL then 
 	_G.FL = true
 	local Label
-	for index, obj in game.Players.LocalPlayer.PlayerGui.WaitForChild("Anim", math.huge):GetChildren() do
+	for index, obj in game.Players.LocalPlayer.PlayerGui:WaitForChild("Anim", math.huge):GetChildren() do
 		if obj:IsA("TextLabel") then
 			if string.find(obj.Text, "Онлайн") then
 				obj.LocalScript.Disabled = true
@@ -9,7 +9,10 @@ if not _G.FL then
 			end
 		end
 	end
-	workspace:WaitForChild("MainTimerForNew", math.huge):WaitForChild("Part", math.huge):WaitForChild("SurfaceGui", math.huge):WaitForChild("TextLabel", math.huge):Changed:Connect(function()
-		Label.Text = workspace.MainTimerForNew.Part.SurfaceGui.TextLabel.Text
+
+    local TL = workspace:WaitForChild("MainTimerForNew", math.huge):WaitForChild("Part", math.huge):WaitForChild("SurfaceGui", math.huge):WaitForChild("TextLabel", math.huge)
+
+	TL.Changed:Connect(function()
+		Label.Text = TL.Text
 	end)
 end
