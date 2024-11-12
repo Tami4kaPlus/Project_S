@@ -9,7 +9,7 @@ if not _G.FL then
 			end
 		end
 	end
-	workspace.WaitForChild("MainTimerForNew", math.huge):WaitForChild("Part", math.huge):WaitForChild("SurfaceGui", math.huge):WaitForChild("TextLabel", math.huge):Changed:Connect(function()
+	workspace:WaitForChild("MainTimerForNew", math.huge):WaitForChild("Part", math.huge):WaitForChild("SurfaceGui", math.huge):WaitForChild("TextLabel", math.huge):Changed:Connect(function()
 		Label.Text = workspace.MainTimerForNew.Part.SurfaceGui.TextLabel.Text
 	end)
 end
