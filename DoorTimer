@@ -1,5 +1,4 @@
-if not _G.FL then 
-	_G.FL = true
+function MMM()
 	local Label
 	for index, obj in game.Players.LocalPlayer.PlayerGui:WaitForChild("Anim", math.huge):GetChildren() do
 		if obj:IsA("TextLabel") then
@@ -15,4 +14,10 @@ if not _G.FL then
 	TL.Changed:Connect(function()
 		Label.Text = TL.Text
 	end)
+end
+
+if not _G.FL then 
+	_G.FL = true
+	MMM()
+	game.Players.LocalPlayer.CharacterAdded:Connect(MMM)
 end
