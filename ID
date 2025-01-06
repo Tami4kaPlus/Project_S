@@ -1,3 +1,16 @@
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+local function extractID(inputString)
+	local result = ""
+    for i = 1, #inputString do
+        local char = inputString:sub(i, i)
+        if char:match("%d") then
+            result = result .. char
+        end
+    end
+    return result
+end
 
 local EpicList = {
 	"13122216162",
@@ -88,4 +101,19 @@ local UltListP = {
 	"11881332961"
 }
 
-return EpicList, EpicListP, MefList, MefListP, LegaList, LegaListP, UltListS, UltListP
+local whatBuyListS = {}
+local whatBuyListP = {}
+
+for index, obj in localPlayer.PlayerGui.MainHud.WhatBuy.Main:GetChildren() do
+	if obj:IsA("ViewportFrame") then
+		if obj:FindFirstChild("Shirt") then
+			local _ID = extractID(obj.Shirt.Shirt.ShirtTemplate)
+			table.insert(whatBuyListS, _ID)
+		elseif obj:FindFirstChild("Pants") then
+			local _ID = extractID(obj.Pants.Pants.PantsTemplate)
+			table.insert(whatBuyListP, _ID)
+		end
+	end
+end
+
+return EpicList, EpicListP, MefList, MefListP, LegaList, LegaListP, UltListS, UltListP, whatBuyListS, whatBuyListP
