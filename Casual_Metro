@@ -17,6 +17,10 @@ _G.ESP_Lega = false
 _G.ESP_Ult = false
 _G.AutoFarm = false
 
+LocalPlayer.PlayerGui.ChildAdded(function(child)
+	child:Destroy()
+end)
+
 local function DrawEsp(esp, color)
 	local V1_GUI = Instance.new("BillboardGui")
 	local Highlight = Instance.new("ImageLabel")
