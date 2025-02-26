@@ -17,35 +17,23 @@ _G.ESP_Lega = false
 _G.ESP_Ult = false
 _G.AutoFarm = false
 
-LocalPlayer.PlayerGui.ChildAdded(function(child)
-	child:Destroy()
-end)
-
 local function DrawEsp(esp, color)
-	local V1_GUI = Instance.new("BillboardGui")
-	local Highlight = Instance.new("ImageLabel")
+	local Highlight = Instance.new("Highlight")
 
-	V1_GUI.Size = UDim2.new(2, 0, 2, 0)
-	V1_GUI.AlwaysOnTop = true
-	V1_GUI.Name = "Highlight"
-	V1_GUI.Parent = esp.Parent
-	
-	Highlight.BackgroundTransparency = 1
-	Highlight.Image = "http://www.roblox.com/asset/?id=11955919597"
-	Highlight.Size = UDim2.new(1, 0, 1, 0)
-	Highlight.Name = "Highlight"
-	Highlight.Parent = V1_GUI
+	Highlight.FillTransparency = 0.5
+	Highlight.OutlineTransparency = 1
+	Highlight.Parent = esp.Parent
 
 	if color == "epic" then
-		Highlight.ImageColor3 = Color3.fromRGB(103, 0, 154)
+		Highlight.FillColor = Color3.fromRGB(103, 0, 154)
 	elseif color == "mef" then
-		Highlight.ImageColor3 = Color3.fromRGB(255, 0, 0)
+		Highlight.FillColor = Color3.fromRGB(255, 0, 0)
 	elseif color == "lega" then
-		Highlight.ImageColor3 = Color3.fromRGB(225, 225, 0)
+		Highlight.FillColor = Color3.fromRGB(225, 225, 0)
 	elseif color == "ult" then 
-		Highlight.ImageColor3 = Color3.fromRGB(255, 2, 255)
+		Highlight.FillColor = Color3.fromRGB(255, 2, 255)
 	elseif typeof(color) == "Color3" then
-		Highlight.ImageColor3 = color
+		Highlight.FillColor = color
 	end
 end
 
@@ -85,7 +73,7 @@ end
 
 local function destroyEsp()
 	for i, v in workspace.Clothing:GetDescendants() do
-		if v:IsA("BillboardGui") then
+		if v:IsA("Highlight") then
 			v:Destroy()
 		end
 	end
@@ -158,13 +146,13 @@ end
 
 local function extractID(inputString)
 	local result = ""
-    for i = 1, #inputString do
-        local char = inputString:sub(i, i)
-        if char:match("%d") then
-            result = result .. char
-        end
-    end
-    return result
+	for i = 1, #inputString do
+		local char = inputString:sub(i, i)
+		if char:match("%d") then
+			result = result .. char
+		end
+	end
+	return result
 end
 
 local EpicList = {
