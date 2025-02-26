@@ -271,7 +271,7 @@ local function Notify(name,content,time)
 	})
 end
 
-Notify("Casual Metro","Version - ".._Version.."", 5)
+Notify("Casual Metro","Version - ".._Version, 5)
 
 _G.SCRIPT_LOADING_ = false
 
