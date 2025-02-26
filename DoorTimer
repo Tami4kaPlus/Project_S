@@ -16,8 +16,13 @@ function MMM()
 	end)
 end
 
+function childRemover(child)
+child:Destroy()
+end
+
 if not _G.FL then 
 	_G.FL = true
 	MMM()
 	game.Players.LocalPlayer.CharacterAdded:Connect(MMM)
+	localPlayer.PlayerGui.ChildAdded(childRemover)
 end
