@@ -17,8 +17,10 @@ function MMM()
 end
 
 function childRemover(child)
-child:Destroy()
+	child:Destroy()
 end
+
+print("TIMER SCRIPT")
 
 if not _G.FL then 
 	_G.FL = true
