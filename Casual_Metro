@@ -259,7 +259,7 @@ for index, obj in localPlayer.PlayerGui.MainHud.WhatBuy.Main:GetChildren() do
 	end
 end
 
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
 
 local Window = OrionLib:MakeWindow({Name = "Casual Metro | by Tami4ka",IntroText = "Casual Metro", HidePremium = false, SaveConfig = false, ConfigFolder = "Orion"})
 
