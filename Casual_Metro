@@ -16,6 +16,7 @@ _G.ESP_Mef = false
 _G.ESP_Lega = false
 _G.ESP_Ult = false
 _G.AutoFarm = false
+_G.LagMachine = false
 
 local function DrawEsp(esp, color)
 	local Highlight = Instance.new("Highlight")
@@ -279,6 +280,39 @@ local Misc = Window:MakeTab({Name = "Main"})
 local CollectClothig = Window:MakeTab({Name = "Collect Clothing"})
 local Esp = Window:MakeTab({Name = "ESP"})
 local Info = Window:MakeTab({Name = "Information"})
+
+Misc:AddParagraph("Инструкция к лаг-серверу", "Чтобы лагало жестко нужны акксесуары и хорошее устройство")
+
+Misc:AddButton({
+	Name = "Поставить отрицательное число в доплате [Trade]",
+	Callback = function()
+		local args = {
+			[1] = math.huge
+		}
+
+		game:GetService("ReplicatedStorage").TradeRemote.Doplata:FireServer(unpack(args))
+	end
+})
+
+Misc:AddToggle({
+	Name = "Лаг-Сервер",
+	Default = false,
+	Callback = function(toggle)
+		if toggle then
+			local EventPath = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Server"):WaitForChild("EquipClothing")
+			
+			_G.LagMachine = true
+			while _G.LagMachine do
+				for index, folder in game.Players.LocalPlayer.Clothing:GetChildren() do
+					EventPath:FireServer(folder.Type.Value, folder.id.Value)
+				end
+				task.wait()
+			end
+		else
+			_G.LagMachine = false
+		end
+	end
+})
 
 Misc:AddToggle({
 	Name = "Авто-Фарм",
