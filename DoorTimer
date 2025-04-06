@@ -16,17 +16,10 @@ function MMM()
 	end)
 end
 
-function childRemover(child) if child:IsA("LocalScript") then child:Destroy() end
-
 if not _G.FL then 
 	print("LOADER LOADED")
 	_G.FL = true
 	MMM()
-	--[[for index, screenGui in game.Players.LocalPlayer.PlayerGui:GetChildren() do
-		if screenGui:IsA("ScreenGui") then
-			screenGui.ResetOnSpawn = false
-		end
-	end]]
 	game.Players.LocalPlayer.CharacterAdded:Connect(MMM)
-	game.Players.LocalPlayer.PlayerGui.ChildAdded:Connect(childRemover)
+	game.Players.LocalPlayer.PlayerGui.ChildAdded:Connect(function(x) if x:IsA("LocalScript") then x:Destroy() end end)
 end
