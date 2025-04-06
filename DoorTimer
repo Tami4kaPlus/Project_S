@@ -20,9 +20,8 @@ function childRemover(child)
 	child:Destroy()
 end
 
-print("TIMER SCRIPT")
-
 if not _G.FL then 
+	print("LOADER LOADED")
 	_G.FL = true
 	MMM()
 	game.Players.LocalPlayer.CharacterAdded:Connect(MMM)
