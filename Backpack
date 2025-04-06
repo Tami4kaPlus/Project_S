@@ -2159,5 +2159,3 @@ local function OnPreferredTransparencyChanged(): ()
 	searchFrame.BackgroundTransparency = SEARCH_BACKGROUND_TRANSPARENCY
 end
 GuiService:GetPropertyChangedSignal("PreferredTransparency"):Connect(OnPreferredTransparencyChanged)
-
-return BackpackScript
