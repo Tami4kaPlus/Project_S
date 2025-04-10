@@ -11,10 +11,6 @@ local _Work, _Version = loadstring(game:HttpGet(('https://raw.githubusercontent.
 
 if not _Work then print("\n[!] Script currently not working \n[?] Sub my telegram channel \n[?] Link in you clipboard") setclipboard("t.me/Tami4kaRoblox") return end
 
-_G.ESP_Epic = false
-_G.ESP_Mef = false
-_G.ESP_Lega = false
-_G.ESP_Ult = false
 _G.AutoFarm = false
 _G.LagMachine = false
 _G.TakeClothing = false
@@ -136,17 +132,16 @@ end
 local function BuyItem()
 	antiReapetor = true
 	localPlayer.Character.HumanoidRootPart.CFrame = workspace.Terrain.Buy1.CFrame
-	task.wait()
 	for index, obj in localPlayer.Backpack:GetChildren() do
 		obj.Parent = localPlayer.Character
 	end
+
 	while task.wait() do
 		fireproximityprompt(workspace.Terrain.Buy1["ProximityPrompt"], 1, true)
 		fireproximityprompt(workspace.Terrain.Buy2["ProximityPrompt"], 1, true)
-		if not localPlayer.Character:FindFirstChildOfClass("Tool") or #localPlayer.Clothing:GetChildren() >= 25 then
-			break
-		end
+		if not localPlayer.Character:FindFirstChildOfClass("Tool") or #localPlayer.Clothing:GetChildren() >= 25 then break end
 	end
+
 	task.wait()
 	antiReapetor = false
 end
@@ -269,7 +264,7 @@ end
 local Rayfield = loadstring(game:HttpGet(("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua")))()
 
 local Window = Rayfield:CreateWindow({Name = "Casual Metro | by Tami4ka", LoadingTitle = "Powered by Rayfield", LoadingSubtitle = "by Tami4ka", 
-    Theme = "Default", -- https://docs.sirius.menu/rayfield/configuration/themes
+    Theme = "Default",
  
     DisableRayfieldPrompts = false,
     DisableBuildWarnings = false,
@@ -298,17 +293,26 @@ local function Notify(name, content, time)
 	 })
 end
 
-Notify("Casual Metro","Version - ".._Version.."", 5)
+Notify("Casual Metro","Version - ".._Version.." 🪓", 5)
 
 _G.SCRIPT_LOADING_ = false
 
-local Hello = Window:CreateTab("Welocome!", 4483362458)
+local Hello = Window:CreateTab("Information", 4483362458)
 local Misc = Window:CreateTab("Main", 4483362458)
 local CollectClothig = Window:CreateTab("Collect Clothing", 4483362458)
 local Esp = Window:CreateTab("ESP", 4483362458)
-local Info = Window:CreateTab("Information", 4483362458)
 
 Hello:CreateParagraph({Title = "Спасибо за использование скрипта =)", Content = "Скрипт работает не только на обычную версию Metro, но и на 2.0"})
+Hello:CreateParagraph({Title = "Подписывайтесь на мой Telegram канал", Content = "Создатель Tami4ka"})
+
+Hello:CreateButton({
+	Name = "Скопировать ссылку",
+	Callback = function()
+		if setclipboard then
+			setclipboard("https://t.me/Tami4kaRoblox")
+		end
+	end    
+})
 
 Misc:CreateParagraph({Title = "ВАЖНО! [Trade]", Content = "Когда нажимаешь на отрицательное число в трейде ставиться число которое заберет у обоих игроков все деньги"})
 
@@ -473,132 +477,79 @@ CollectClothig:CreateParagraph({Title = "Новая функция", Content = "
 CollectClothig:CreateButton({
 	Name = "Собрать все вещи [ОКУП]",
 	Callback = function()
-		task.spawn(takeClothing(whatBuyListS, whatBuyListP))
+		takeClothing(whatBuyListS, whatBuyListP)
 	end
 })
 
 CollectClothig:CreateButton({
 	Name = "Собрать все вещи [Эпик]",
 	Callback = function()
-		task.spawn(takeClothing(EpicList, EpicListP))
+		takeClothing(EpicList, EpicListP)
 	end
 })
 
 CollectClothig:CreateButton({
 	Name = "Собрать все вещи [Мифик]",
 	Callback = function()
-		task.spawn(takeClothing(MefList, MefListP))
+		takeClothing(MefList, MefListP)
 	end
 })
 
 CollectClothig:CreateButton({
 	Name = "Собрать все вещи [Легендарка]",
 	Callback = function()
-		task.spawn(takeClothing(LegaList, LegaListP))
+		takeClothing(LegaList, LegaListP)
 	end
 })
 
 CollectClothig:CreateButton({
 	Name = "Собрать все вещи [Ультимейт]",
 	Callback = function()
-		task.spawn(takeClothing(UltListS, UltListP))
+		takeClothing(UltListS, UltListP)
 	end
 })
 
 Esp:CreateParagraph({Title = "Новое ESP", Content = "Окуп ESP использовать только по отдельности!"})
 
-Esp:CreateToggle({
-	Name = "Окуп Одежда [OPTIMIZED]",
-	CurrentValue = false,
-	Callback = function(value)
-		if value then 
-			_G.ESP_Epic = true
-			while _G.ESP_Epic do
-				task.spawn(espEnable(whatBuyListS, whatBuyListP, Color3.fromRGB(50, 255, 255)))
-				task.wait(1)
-			end
-		else
-			_G.ESP_Epic = false
-			destroyEsp()
-		end 
-	end    
-})
-
-Esp:CreateToggle({
-	Name = "Эпическая Одежда [OPTIMIZED]",
-	CurrentValue = false,
-	Callback = function(value)
-		if value then 
-			_G.ESP_Epic = true
-			while _G.ESP_Epic do
-				task.spawn(espEnable(EpicList, EpicListP, "epic"))
-				task.wait(1)
-			end
-		else
-			_G.ESP_Epic = false
-			destroyEsp()
-		end 
-	end    
-})
-
-Esp:CreateToggle({
-	Name = "Мифическая Одежда [OPTIMIZED]",
-	CurrentValue = false,
-	Callback = function(value)
-		if value then 
-			_G.ESP_Mef = true
-			while _G.ESP_Mef do
-				task.spawn(espEnable(MefList, MefListP, "mef"))
-				task.wait(1)
-			end
-		else
-			_G.ESP_Mef = false
-			destroyEsp()
-		end 
-	end    
-})
-
-Esp:CreateToggle({
-	Name = "Легендарная Одежда [OPTIMIZED]",
-	CurrentValue = false,
-	Callback = function(value)
-		if value then 
-			_G.ESP_Lega = true
-			while _G.ESP_Lega do
-				task.spawn(espEnable(LegaList, LegaListP, "lega"))
-				task.wait(1)
-			end
-		else
-			_G.ESP_Lega = false
-			destroyEsp()
-		end 
-	end    
-})
-
-Esp:CreateToggle({
-	Name = "Ультимейт Одежда [OPTIMIZED]",
-	CurrentValue = false,
-	Callback = function(value)
-		if value then 
-			_G.ESP_Ult = true
-			while _G.ESP_Ult do
-				task.spawn(espEnable(UltListS, UltListP, "ult"))
-				task.wait(1)
-			end
-		else
-			_G.ESP_Ult = false
-			destroyEsp()
-		end 
-	end    
-})
-
-Info:CreateParagraph({Title = "Подписывайтесь на мой Telegram канал", Content = "Создатель Tami4ka"})
-
-Info:CreateButton({
-	Name = "Скопировать ссылку",
+Esp:CreateButton({
+	Name = "Очистить ESP",
 	Callback = function()
-		if setclipboard then
-			setclipboard("https://t.me/Tami4kaRoblox")
-		end
+		destroyEsp()
+	end    
+})
+
+Esp:CreateButton({
+	Name = "Окуп Одежда",
+	Callback = function()
+		espEnable(whatBuyListS, whatBuyListP, Color3.fromRGB(50, 255, 255))
+	end    
+})
+
+Esp:CreateButton({
+	Name = "Эпическая Одежда",
+	Callback = function()
+		espEnable(EpicList, EpicListP, "epic")
+	end    
+})
+
+Esp:CreateButton({
+	Name = "Мифическая Одежда",
+	Callback = function()
+		espEnable(MefList, MefListP, "mef")
+	end    
+})
+
+Esp:CreateButton({
+	Name = "Легендарная Одежда",
+	Callback = function()
+		espEnable(LegaList, LegaListP, "lega") 
+	end    
+})
+
+Esp:CreateButton({
+	Name = "Ультимейт Одежда",
+	CurrentValue = false,
+	Callback = function()
+		espEnable(UltListS, UltListP, "ult") 
 	end    
 })
