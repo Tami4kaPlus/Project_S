@@ -3,17 +3,19 @@ local localPlayer = Players.LocalPlayer
 
 if _G.SCRIPT_LOADING_ == true then return else _G.SCRIPT_LOADING_ = true end
 
+if not game.ReplicatedStorage:FindFirstChild("ToolFolders") then
+	local folder = Instance.new("Folder")
+	folder.Name = "ToolFolders"
+	folder.Parent = game.ReplicatedStorage
+end
+
 loadstring(game:HttpGet(('https://raw.githubusercontent.com/Tami4kaPlus/Project_S/main/DoorTimer')))()
-
-local antiReapetor = false
-local ColorEsp = Color3.fromRGB(255, 55, 155)
 local _Work, _Version = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Tami4kaPlus/Project_S/main/Status')))()
-
-if not _Work then print("\n[!] Script currently not working \n[?] Sub my telegram channel \n[?] Link in you clipboard") setclipboard("t.me/Tami4kaRoblox") return end
 
 _G.AutoFarm = false
 _G.LagMachine = false
 _G.TakeClothing = false
+_G.TakeAllClothing = false
 
 local function DrawEsp(esp, color)
 	local Highlight = Instance.new("Highlight")
@@ -35,38 +37,32 @@ local function DrawEsp(esp, color)
 	end
 end
 
-local function espEnable(listS, listP, string)
-	for i, v in workspace.Clothing:GetChildren() do
-		if v.Name == "Shirt" then
-			for index, obj in v.Main:GetChildren() do
-				if not obj:FindFirstChild("Highlight") then
-					for index, id in pairs(listS) do
-						if obj.Shirt.ShirtTemplate == "rbxassetid://"..id then
-							DrawEsp(obj.Shirt, string)
-						end
-					end
-				elseif obj:FindFirstChild("Highlight") then
-					if obj.Shirt.ShirtTemplate == "rbxassetid://1" then
-						obj.Highlight:Destroy()
-					end
+local function GetClothings(Type)
+    local Clothings = {}
+    for i, v in workspace.Clothing:GetChildren() do
+        if v.Name == Type then
+            for index, obj in v.Main:GetChildren() do
+                table.insert(Clothings, obj)
+            end
+        end
+    end
+    return Clothings
+end
+
+local function espEnable(ClothingList, ClothingType, string)
+    for index, obj in GetClothings(ClothingType) do
+        if not obj:FindFirstChild("Highlight") then
+		     for index, id in pairs(ClothingList) do
+				if obj:FindFirstChild(ClothingType)[ClothingType.."Template"] == "rbxassetid://"..id then
+					DrawEsp(obj[ClothingType], string)
 				end
-			end
-		elseif v.Name == "Pants" then
-			for index, obj in v.Main:GetChildren() do
-				if not obj:FindFirstChild("Highlight") then
-					for index, id in pairs(listP) do
-						if obj.Pants.PantsTemplate == "rbxassetid://"..id then
-							DrawEsp(obj.Pants, string)
-						end
-					end
-				elseif obj:FindFirstChild("Highlight") then
-					if obj.Pants.PantsTemplate == "rbxassetid://1" then
-						obj.Highlight:Destroy()
-					end
-				end
+			 end
+		elseif obj:FindFirstChild("Highlight") then
+			if obj.Shirt.ShirtTemplate == "rbxassetid://1" then
+				obj.Highlight:Destroy()
 			end
 		end
-	end
+    end
 end
 
 local function destroyEsp()
@@ -81,80 +77,83 @@ local function equipTool(Tool)
     if Tool and Tool:IsA("Tool") then 
         Tool.ManualActivationOnly = true 
         Tool.Parent = localPlayer.Character 
+		task.delay(0.2, function()
+			Tool.Parent = game.ReplicatedStorage.ToolFolders
+		end)
     end
 end
 
-local function takeClothing(listS, listP)
-	antiReapetor = true
-	for i, v in workspace.Clothing:GetChildren() do
-		if v.Name == "Shirt" then
-			for index, obj in v.Main:GetChildren() do
-				for index, id in pairs(listS) do
-					if obj.Shirt.ShirtTemplate == "rbxassetid://"..id then
-						localPlayer.Character.HumanoidRootPart.CFrame = obj.Mouse.CFrame + Vector3.new(0, 5, 0)
-						local ClickDetector = obj.Mouse:WaitForChild("ClickDetector", math.huge)
-						repeat fireclickdetector(ClickDetector) task.wait(0.5) until obj.bzi.Value or (obj.Mouse.Position - localPlayer.Character.HumanoidRootPart.Position).Magnitude >= 7
-						equipTool(localPlayer.Backpack:FindFirstChildOfClass("Tool"))
-					end
-				end
-			end
-		elseif v.Name == "Pants" then
-			for index, obj in v.Main:GetChildren() do
-				for index, id in pairs(listP) do
-					if obj.Pants.PantsTemplate == "rbxassetid://"..id then
-						localPlayer.Character.HumanoidRootPart.CFrame = obj.Mouse.CFrame + Vector3.new(0, 5, 0)
-						local ClickDetector = obj.Mouse:WaitForChild("ClickDetector", math.huge)
-						repeat fireclickdetector(ClickDetector) task.wait(0.5) until obj.bzi.Value or (obj.Mouse.Position - localPlayer.Character.HumanoidRootPart.Position).Magnitude >= 7
-						equipTool(localPlayer.Backpack:FindFirstChildOfClass("Tool"))
-					end
-				end
+local function takeClothing(list, ClothingType, PositionOffset)
+	for index, obj in GetClothings(ClothingType) do
+		for index, id in pairs(list) do
+			if obj:FindFirstChild(ClothingType)[ClothingType.."Template"] == "rbxassetid://"..id then
+				localPlayer.Character.HumanoidRootPart.CFrame = obj.Mouse.CFrame + PositionOffset
+				local ClickDetector = obj.Mouse:WaitForChild("ClickDetector", 5)
+				repeat fireclickdetector(ClickDetector) task.wait() until obj.bzi.Value or (obj.Mouse.Position - localPlayer.Character.HumanoidRootPart.Position).Magnitude >= 10
+				equipTool(localPlayer.Backpack:FindFirstChildOfClass("Tool"))
+				task.wait()
 			end
 		end
 	end
+	
 	for index, obj in localPlayer.Backpack:GetChildren() do
 		obj.Parent = localPlayer.Character
 	end
-	antiReapetor = false
+
+	return true
 end
 
-local function SellItem()
-	antiReapetor = true
-	localPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(175, 20, -35)
-	task.wait(0.2)
+local function SellItem(Pos)
+	if Pos then
+		localPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(Pos)
+	else
+		localPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(175, 20, -35)
+	end
+	
+	task.wait()
 	for index, folder in localPlayer.Clothing:GetChildren() do
 		game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Server"):WaitForChild("Sell"):FireServer(folder.Name)
-		task.wait()
 	end
-	task.wait(0.2)
-	antiReapetor = false
+	task.wait()
+
+	return true
 end
 
-local function BuyItem()
-	antiReapetor = true
-	localPlayer.Character.HumanoidRootPart.CFrame = workspace.Terrain.Buy1.CFrame
+local function BuyItem(Pos)
+	if Pos then
+		localPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(Pos)
+	else
+		localPlayer.Character.HumanoidRootPart.CFrame = workspace.Terrain.Buy1.CFrame
+	end
+
+	task.wait()
 	for index, obj in localPlayer.Backpack:GetChildren() do
-		obj.Parent = localPlayer.Character
+		equipTool(Tool)
 	end
 
 	while task.wait() do
-		fireproximityprompt(workspace.Terrain.Buy1["ProximityPrompt"], 1, true)
-		fireproximityprompt(workspace.Terrain.Buy2["ProximityPrompt"], 1, true)
+		fireproximityprompt(workspace.Terrain.Buy1["ProximityPrompt"], 0.5, true)
 		if not localPlayer.Character:FindFirstChildOfClass("Tool") or #localPlayer.Clothing:GetChildren() >= 25 then break end
 	end
 
 	task.wait()
-	antiReapetor = false
+	return true
 end
 
-local function extractID(inputString)
-	local result = ""
-	for i = 1, #inputString do
-		local char = inputString:sub(i, i)
-		if char:match("%d") then
-			result = result .. char
+local function CollectClothing(ClothingType, ClothList)
+	for index, obj in GetClothings(ClothingType) do
+		if ClothList ~= nil then
+			for index, id in pairs(ClothList) do
+				if obj:FindFirstChild(ClothingType)[ClothingType.."Template"] == "rbxassetid://"..id then
+					local ClickDetector = obj.Mouse:FindFirstChild("ClickDetector") 
+					if ClickDetector and not obj.bzi.Value and (obj.Mouse.Position - localPlayer.Character.HumanoidRootPart.Position).Magnitude <= 17 then fireclickdetector(ClickDetector) end task.wait()
+				end
+			end
+		elseif ClothList == nil then
+			local ClickDetector = obj.Mouse:FindFirstChild("ClickDetector") 
+			if ClickDetector and not obj.bzi.Value and (obj.Mouse.Position - localPlayer.Character.HumanoidRootPart.Position).Magnitude <= 17 then fireclickdetector(ClickDetector) end
 		end
 	end
-	return result
 end
 
 local EpicList = {
@@ -214,7 +213,11 @@ local LegaList = {
 	"13023747652",
 	"13634019459",
 	"14387015395",
-	"8195412170"
+	"8195412170",
+	"8656691531",
+	"14752060743",
+	"17540162234",
+	"12867315395"
 }
 
 local LegaListP = {
@@ -234,7 +237,8 @@ local UltListS = {
 	"85873511189587",
 	"13735603351",
 	"129264610471514",
-	"18120163096"
+	"18120163096",
+	"12549463467"
 }
 
 local UltListP = {
@@ -252,10 +256,10 @@ local whatBuyListP = {}
 for index, obj in localPlayer.PlayerGui.MainHud.WhatBuy.Main:GetChildren() do
 	if obj:IsA("ViewportFrame") then
 		if obj:FindFirstChild("Shirt") then
-			local _ID = extractID(obj.Shirt.Shirt.ShirtTemplate)
+			local _ID = obj.Shirt.Shirt.ShirtTemplate:gsub("%D", "")
 			table.insert(whatBuyListS, _ID)
 		elseif obj:FindFirstChild("Pants") then
-			local _ID = extractID(obj.Pants.Pants.PantsTemplate)
+			local _ID = obj.Pants.Pants.PantsTemplate:gsub("%D", "")
 			table.insert(whatBuyListP, _ID)
 		end
 	end
@@ -263,26 +267,21 @@ end
 
 local Rayfield = loadstring(game:HttpGet(("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua")))()
 
-local Window = Rayfield:CreateWindow({Name = "Casual Metro | by Tami4ka", LoadingTitle = "Powered by Rayfield", LoadingSubtitle = "by Tami4ka", 
-    Theme = "Default",
- 
-    DisableRayfieldPrompts = false,
+local Window = Rayfield:CreateWindow({Name = "Casual Metro | by Tami4ka", LoadingTitle = "Powered by Rayfield", LoadingSubtitle = "by Tami4ka",  Theme = "Default",
+	DisableRayfieldPrompts = false,
     DisableBuildWarnings = false,
- 
     ConfigurationSaving = {
        Enabled = true,
        FolderName = nil,
        FileName = "Tami4kaCasualHub"
     },
- 
     Discord = {
        Enabled = false,
        Invite = "noinvitelink",
        RememberJoins = true
     },
- 
-    KeySystem = false
-})
+ 	KeySystem = false})
+
 
 local function Notify(name, content, time)
 	Rayfield:Notify({
@@ -293,20 +292,22 @@ local function Notify(name, content, time)
 	 })
 end
 
-Notify("Casual Metro","Version - ".._Version.." 🪓", 5)
+Notify("Casual Metro","Version - ".._Version.." | by Tami4ka", 5)
 
 _G.SCRIPT_LOADING_ = false
+if not _Work then print("\n[!] Script currently not working \n[?] Sub my telegram channel \n[?] Link in you clipboard") setclipboard("t.me/Tami4kaRoblox") return end
 
 local Hello = Window:CreateTab("Information", 4483362458)
 local Misc = Window:CreateTab("Main", 4483362458)
-local CollectClothig = Window:CreateTab("Collect Clothing", 4483362458)
+local Main = Window:CreateTab("Misc", 4483362458)
 local Esp = Window:CreateTab("ESP", 4483362458)
+local Dev = Window:CreateTab("Dev Functions", 4483362458)
 
 Hello:CreateParagraph({Title = "Спасибо за использование скрипта =)", Content = "Скрипт работает не только на обычную версию Metro, но и на 2.0"})
-Hello:CreateParagraph({Title = "Подписывайтесь на мой Telegram канал", Content = "Создатель Tami4ka"})
+Hello:CreateLabel("Создатель: Tami4ka", "rewind")
 
 Hello:CreateButton({
-	Name = "Скопировать ссылку",
+	Name = "Скопировать ссылку [Telegram]",
 	Callback = function()
 		if setclipboard then
 			setclipboard("https://t.me/Tami4kaRoblox")
@@ -329,22 +330,38 @@ Misc:CreateToggle({
 	Callback = function(toggle)
 		if toggle then
 			if fireclickdetector and fireproximityprompt then
-                _G.AutoFarm = true
+				local T = localPlayer.Character.HumanoidRootPart
+				local BV = Instance.new('BodyVelocity')
                 local _X = Instance.new("BoolValue")
+				local BG = Instance.new('BodyGyro')
+				
+				BG.P = 9e4
+				BG.Parent = T
+				BV.Parent = T
+				BG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+				BG.cframe = T.CFrame
+				BV.velocity = Vector3.new(0, 0, 0)
+				BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
+				localPlayer.Character.Humanoid.PlatformStand = true
+                _G.AutoFarm = true
+
                 while _G.AutoFarm do
                     coroutine.wrap(function()
-                        takeClothing(whatBuyListS, whatBuyListP)
-                        repeat wait(0.1) until not antiReapetor
+                        takeClothing(whatBuyListS, "Shirt", Vector3.new(0, -5, 0))
+                        takeClothing(whatBuyListP, "Pants", Vector3.new(0, -5, 0))
                         wait(1)
-                        BuyItem()
+                        BuyItem(Vector3.new(-125, 10, -135))
                         wait(1)
-                        SellItem()
-                        repeat wait(0.1) until not antiReapetor
+                        SellItem(Vector3.new(175, 10, -30))
                         wait(2)
                         _X.Value = not _X.Value
                     end)()
                     _X.Changed:Wait()
                 end
+
+				localPlayer.Character.Humanoid.PlatformStand = false
+				BG:Destroy()
+				BV:Destroy()
             end
 		else
 			_G.AutoFarm = false
@@ -361,33 +378,38 @@ Misc:CreateToggle({
                 _G.AutoFarm = true
 				while _G.AutoFarm do
 					coroutine.wrap(function()
-						for i, v in workspace.Clothing:GetChildren() do
-							if v.Name == "Shirt" then
-								for index, obj in v.Main:GetChildren() do
-									for index, id in pairs(whatBuyListS) do
-										if obj.Shirt.ShirtTemplate == "rbxassetid://"..id then
-											local ClickDetector = obj.Mouse:WaitForChild("ClickDetector", math.huge)
-											fireclickdetector(ClickDetector)
-										end
-									end
-								end
-							elseif v.Name == "Pants" then
-								for index, obj in v.Main:GetChildren() do
-									for index, id in pairs(whatBuyListP) do
-										if obj.Pants.PantsTemplate == "rbxassetid://"..id then
-											local ClickDetector = obj.Mouse:WaitForChild("ClickDetector", math.huge)
-											fireclickdetector(ClickDetector)
-										end
-									end
-								end
-							end
-						end
+						local Temp1, Temp2 = "Shirt", "Pants"
+						CollectClothing(Temp1, whatBuyListS)
+						CollectClothing(Temp2, whatBuyListP)
 					end)()
 					task.wait(1)
 				end
 			end
 		else
 			_G.AutoFarm = false
+		end
+	end
+})
+
+Misc:CreateToggle({
+	Name = "Забирать все вещи",
+	CurrentValue = false,
+	Callback = function(toggle)
+		if toggle then
+			if fireclickdetector then
+                _G.TakeAllClothing = true
+				while _G.TakeAllClothing do
+					coroutine.wrap(function()
+						CollectClothing("Shirt", nil)
+					end)()
+					coroutine.wrap(function()
+						CollectClothing("Pants", nil)
+					end)()
+					task.wait(0.25)
+				end
+			end
+		else
+			_G.TakeAllClothing = false
 		end
 	end
 })
@@ -403,7 +425,7 @@ Misc:CreateToggle({
 					for index, tool in localPlayer.Backpack:GetChildren() do
                         equipTool(tool)
                     end
-					task.wait(1)
+					task.wait(0.25)
 				end
 			end
 		else
@@ -412,7 +434,7 @@ Misc:CreateToggle({
 	end
 })
 
-Misc:CreateButton({
+Main:CreateButton({
 	Name = "Взять все вещи в руки (Обход лимита предметов)",
 	Callback = function()
 		for index, tool in localPlayer.Backpack:GetChildren() do
@@ -421,35 +443,44 @@ Misc:CreateButton({
 	end
 })
 
-Misc:CreateButton({
+Main:CreateButton({
+	Name = "Вернуть вещи в инвентарь",
+	Callback = function()
+		for index, tool in game.ReplicatedStorage.ToolFolders:GetChildren() do
+            tool.Parent = localPlayer.Backpack
+        end
+	end
+})
+
+Main:CreateButton({
 	Name = "Продать все вещи",
 	Callback = function()
 		SellItem()
 	end
 })
 
-Misc:CreateButton({
+Main:CreateButton({
 	Name = "Оплатить одежду",
 	Callback = function()
 		BuyItem()
 	end
 })
 
-Misc:CreateButton({
+Main:CreateButton({
 	Name = "Телепорт в секонд хенд",
 	Callback = function()
 		localPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-85, 20, -135)
 	end
 })
 
-Misc:CreateButton({
+Main:CreateButton({
 	Name = "Телепорт к продавцу",
 	Callback = function()
 		localPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(175, 20, -35)
 	end
 })
 
-Misc:CreateButton({
+Main:CreateButton({
 	Name = "Собрать все листочки на карте",
 	Callback = function()
         local currentCFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
@@ -457,7 +488,7 @@ Misc:CreateButton({
 		for index, obj in workspace:GetChildren() do
 			if obj.Name == "LISTOK" then
 				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = obj.Listok.CFrame
-                task.wait(0.025)
+                task.wait()
 			end
 		end
 
@@ -465,51 +496,12 @@ Misc:CreateButton({
 	end
 })
 
-Misc:CreateButton({
+Main:CreateButton({
 	Name = "Удобный рюкзак [NEW]",
 	Callback = function()
 		loadstring(game:HttpGet(("https://raw.githubusercontent.com/Tami4kaPlus/Project_S/main/Backpack")))()
 	end
 })
-
-CollectClothig:CreateParagraph({Title = "Новая функция", Content = "Это тестовая версия этой функции, вы можете столкнуться с ошибками"})
-
-CollectClothig:CreateButton({
-	Name = "Собрать все вещи [ОКУП]",
-	Callback = function()
-		takeClothing(whatBuyListS, whatBuyListP)
-	end
-})
-
-CollectClothig:CreateButton({
-	Name = "Собрать все вещи [Эпик]",
-	Callback = function()
-		takeClothing(EpicList, EpicListP)
-	end
-})
-
-CollectClothig:CreateButton({
-	Name = "Собрать все вещи [Мифик]",
-	Callback = function()
-		takeClothing(MefList, MefListP)
-	end
-})
-
-CollectClothig:CreateButton({
-	Name = "Собрать все вещи [Легендарка]",
-	Callback = function()
-		takeClothing(LegaList, LegaListP)
-	end
-})
-
-CollectClothig:CreateButton({
-	Name = "Собрать все вещи [Ультимейт]",
-	Callback = function()
-		takeClothing(UltListS, UltListP)
-	end
-})
-
-Esp:CreateParagraph({Title = "Новое ESP", Content = "Окуп ESP использовать только по отдельности!"})
 
 Esp:CreateButton({
 	Name = "Очистить ESP",
@@ -521,28 +513,33 @@ Esp:CreateButton({
 Esp:CreateButton({
 	Name = "Окуп Одежда",
 	Callback = function()
-		espEnable(whatBuyListS, whatBuyListP, Color3.fromRGB(50, 255, 255))
+	    local colorEsp = Color3.fromRGB(50, 255, 255)
+	    espEnable(whatBuyListS, "Shirt", colorEsp)
+	    espEnable(whatBuyListP, "Pants", colorEsp)
 	end    
 })
 
 Esp:CreateButton({
 	Name = "Эпическая Одежда",
 	Callback = function()
-		espEnable(EpicList, EpicListP, "epic")
+	    espEnable(EpicList, "Shirt", "epic")
+	    espEnable(EpicListP, "Pants", "epic")
 	end    
 })
 
 Esp:CreateButton({
 	Name = "Мифическая Одежда",
 	Callback = function()
-		espEnable(MefList, MefListP, "mef")
+	    espEnable(MefList, "Shirt", "mef")
+	    espEnable(MefListP, "Pants", "med")
 	end    
 })
 
 Esp:CreateButton({
 	Name = "Легендарная Одежда",
 	Callback = function()
-		espEnable(LegaList, LegaListP, "lega") 
+	    espEnable(LegaList, "Shirt", "lega")
+	    espEnable(LegaListP, "Pants", "lega")
 	end    
 })
 
@@ -550,6 +547,28 @@ Esp:CreateButton({
 	Name = "Ультимейт Одежда",
 	CurrentValue = false,
 	Callback = function()
-		espEnable(UltListS, UltListP, "ult") 
+	    espEnable(UltListS, "Shirt", "ult")
+	    espEnable(UltListP, "Pants", "ult")
 	end    
 })
+
+Dev:CreateLabel("Чтобы получить ID вещи нужно надеть ее", "rewind")
+
+Dev:CreateButton({
+	Name = "Скопировать ID [Кофта]",
+	Callback = function()
+		local ClothingType = "Shirt"
+		local ID = localPlayer.Character[ClothingType][ClothingType.."Template"]
+		setclipboard(ID:gsub("%D", ""))
+	end
+})
+
+Dev:CreateButton({
+	Name = "Скопировать ID [Штаны]",
+	Callback = function()
+		local ClothingType = "Pants"
+		local ID = localPlayer.Character[ClothingType][ClothingType.."Template"]
+		setclipboard(ID:gsub("%D", ""))
+	end
+})
+
