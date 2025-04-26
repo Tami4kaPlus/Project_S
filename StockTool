@@ -75,6 +75,8 @@ local Misc = Window:CreateTab("Configuration", 4483362458)
 local Settings = Window:CreateTab("Settings", 4483362458)
 local ESP = Window:CreateTab("ESP", 4483362458)
 
+_G.CurrentObjectText = ""
+
 local LabelCurrentConfig = Misc:CreateLabel("Текущий конфиг: "..CurrentConfig, "rewind")
 local InformationLabel = Settings:CreateLabel("Одежда для добавления: ".._G.CurrentObjectText.."\nМин. цена: "..MinPrice.."\n".."Макс. Цена: "..MaxPrice, "rewind")
 
