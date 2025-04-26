@@ -1,4 +1,5 @@
 local CurrentConfig = "nil"
+local CurrentClothing = "nil"
 local CurrentClothingName = "nil"
 local Configuration = {}
 local ConfigsList = {}
@@ -149,8 +150,57 @@ Misc:CreateButton({
 	end
 })
 
+Misc:CreateButton({
+	Name = "Debug [/console]",
+	Callback = function()
+		print(game.HttpService:JSONEncode(Configuration))
+	end
+})
+
+local ClothingDropdown = Settings:CreateDropdown({
+	Name = "Одежда [Config]",
+	Options = {},
+	CurrentOption = "...",
+	MultipleOptions = false,
+	Callback = function(Options)
+		if typeof(Options) == "table" then print("Unpack [1]") Options = table.unpack(Options) end
+		if typeof(CurrentConfig) == "table" then print("Unpack [2]")  CurrentConfig = table.unpack(CurrentConfig) end
+
+ 		CurrentClothing = Options
+		MaxPrice = Configuration[CurrentClothing]["Max"]
+		MinPrice = Configuration[CurrentClothing]["Min"]
+		_G.CurrentObjectText = CurrentClothing
+		
+		print(CurrentClothing, Options)
+	end
+})
+
 Settings:CreateButton({
-	Name = "Создать одежду [Смотрите тутор]",
+	Name = "Обновить список [Config]",
+	Callback = function()
+		local Table = {}
+		for index, cloth in Configuration do
+			table.insert(Table, cloth.Clothing)
+		end
+		ClothingDropdown:Refresh(Table)
+	end
+})
+
+Settings:CreateButton({
+	Name = "Удалить из списока [Config]",
+	Callback = function()
+		Configuration[CurrentClothing] = nil
+
+		local Table = {}
+		for index, cloth in Configuration do
+			table.insert(Table, cloth.Clothing)
+		end
+		ClothingDropdown:Refresh(Table)
+	end
+})
+
+Settings:CreateButton({
+	Name = "Обновить/Создать одежду",
 	Callback = function()
 		print(_G.CurrentObjectText)
 		if _G.CurrentObjectText then
@@ -163,13 +213,6 @@ Settings:CreateButton({
 
 			Notify(_G.CurrentObjectText, "Макс. цена: "..MaxPrice.." | Мин. цена: "..MinPrice, 5)
 		end
-	end
-})
-
-Settings:CreateButton({
-	Name = "Debug [/console]",
-	Callback = function()
-		print(game.HttpService:JSONEncode(Configuration))
 	end
 })
 
