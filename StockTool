@@ -6,16 +6,21 @@ local ConfigsList = {}
 
 local ConfigName = "Default"
 local MainFolderName = "StockTool"
+local formatFile = [[.json]]
 
 local MinPrice = 0
 local MaxPrice = 1
+
+local HttpService = game:GetService("HttpService")
+
+_G.ESP_Config = false
 
 if not isfolder(MainFolderName) then
 	makefolder(MainFolderName)
 end
 
-if not isfile(MainFolderName.."/Default") then
-	writefile(MainFolderName.."/Default", game.HttpService:JSONEncode(Configuration))
+if not isfile(MainFolderName.."/Default"..formatFile) then
+	writefile(MainFolderName.."/Default"..formatFile, HttpService:JSONEncode(Configuration))
 end
 
 if _G.ProximityPromptServicePromptShown or not _G.CurrentObjectText then
@@ -47,7 +52,7 @@ local Window = Rayfield:CreateWindow({Name = "Casual Stock Tool | by Tami4ka", L
 	DisableBuildWarnings = false,
 
 	ConfigurationSaving = {
-		Enabled = true,
+		Enabled = false,
 		FolderName = nil,
 		FileName = "Tami4kaCasualHub"
 	},
@@ -61,12 +66,12 @@ local Window = Rayfield:CreateWindow({Name = "Casual Stock Tool | by Tami4ka", L
 	KeySystem = false
 })
 
-local function Notify(name, content, time)
+local function Notify(name, content, time, image)
 	Rayfield:Notify({
 		Title = name,
 		Content = content,
-		Duration = time,
-		Image = 4483362458,
+		Duration = time or 5,
+		Image = image or 4483362458,
 	})
 end
 
@@ -91,13 +96,13 @@ local ConfigsDropdown = Misc:CreateDropdown({
 		if typeof(CurrentConfig) == "table" then print("Unpack [2]")  CurrentConfig = table.unpack(CurrentConfig) end
 
  		CurrentConfig = Options
-		Configuration = game:GetService("HttpService"):JSONDecode(readfile(MainFolderName.."/"..CurrentConfig))
+		Configuration = HttpService:JSONDecode(readfile(MainFolderName.."/"..CurrentConfig))
 		
 		LabelCurrentConfig:Set("Текущий конфиг: "..CurrentConfig)
-		
-		print(CurrentConfig, Options)
 	end
 })
+
+local Section = Misc:CreateSection("Настройка")
 
 Misc:CreateButton({
 	Name = "Обновить список [Config]",
@@ -126,12 +131,12 @@ Misc:CreateInput({
 Misc:CreateButton({
 	Name = "Создать кофиг [Config]",
 	Callback = function()
-		if not isfile(MainFolderName.."/"..ConfigName) then
-			local Config = game.HttpService:JSONEncode({})
+		if not isfile(MainFolderName.."/"..ConfigName..formatFile) then
+			local Config = HttpService:JSONEncode({})
 			Configuration = Config
-			writefile(MainFolderName.."/"..ConfigName, Config)
+			writefile(MainFolderName.."/"..ConfigName..formatFile, Config)
 
-			Notify('Успешно!', "Название: ".. CurrentConfig, 5)
+			Notify('Успешно!', "Название: ".. ConfigName, 5)
 		else
 			Notify("Конфиг с таким название уже существует", "попрорбуйте другое имя", 5)
 		end
@@ -143,7 +148,7 @@ Misc:CreateButton({
 	Callback = function()
 		if isfile(MainFolderName.."/"..CurrentConfig) then
 			Notify('Успешно!', "Название: ".. CurrentConfig, 5)
-			writefile(MainFolderName.."/"..CurrentConfig, game:GetService("HttpService"):JSONEncode(Configuration))
+			writefile(MainFolderName.."/"..CurrentConfig, HttpService:JSONEncode(Configuration))
 		else
 			Notify("Конфига с таким название не существует", "попрорбуйте другое имя", 5)
 		end
@@ -153,7 +158,7 @@ Misc:CreateButton({
 Misc:CreateButton({
 	Name = "Debug [/console]",
 	Callback = function()
-		print(game.HttpService:JSONEncode(Configuration))
+		print(HttpService:JSONEncode(Configuration))
 	end
 })
 
@@ -174,6 +179,8 @@ local ClothingDropdown = Settings:CreateDropdown({
 		print(CurrentClothing, Options)
 	end
 })
+
+local Section = Settings:CreateSection("Настройка")
 
 Settings:CreateButton({
 	Name = "Обновить список [Config]",
@@ -248,7 +255,6 @@ ESP:CreateToggle({
 			_G.ESP_Config = true
 
 			while _G.ESP_Config do
-
 				for index, store in workspace.World.Debris.Stores:GetChildren() do
 					if not store:FindFirstChild("PlacementContainer") then continue end
 					for index, container in store.PlacementContainer:GetChildren() do
